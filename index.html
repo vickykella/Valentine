@@ -25,6 +25,7 @@
       width: 90%;
       max-width: 340px;
       box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      z-index: 2;
     }
 
     h2 {
@@ -74,11 +75,30 @@
       width: 8px;
       height: 8px;
       animation: fall 3s linear infinite;
+      z-index: 1;
+    }
+
+    .heart {
+      position: fixed;
+      animation: heartFall linear forwards;
+      z-index: 1;
+      pointer-events: none;
     }
 
     @keyframes fall {
       from { transform: translateY(-10vh) rotate(0deg); }
       to { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    @keyframes heartFall {
+      from {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(120vh) scale(1.5);
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -105,6 +125,7 @@
   const modalButtons = document.getElementById("modalButtons");
 
   let scramble = true;
+  let heartInterval;
 
   function randomPosition() {
     const x = Math.random() * (window.innerWidth - 120);
@@ -135,7 +156,7 @@
     showModal(
       "Are you sure? 😌",
       [
-        { text: "No", action: confirmYes },
+        { text: "No", action: closeModal },   // ✅ FIXED
         { text: "Yes", action: finalYes }
       ]
     );
@@ -144,25 +165,23 @@
   function finalYes() {
     closeModal();
     launchConfetti();
+    startHeartRain();
 
     setTimeout(() => {
       showModal(
         "You're in bad luck 😄 I’m not leaving you for the rest of my life ❤️",
         [
-          {
-            text: "You wanna let him know you said YES?",
-            action: sendResponse
-          }
+          { text: "You wanna let him know you said YES?", action: sendResponse },
+          { text: "Close", action: closeEverything }
         ]
       );
-    }, 600);
+    }, 700);
   }
 
   function sendResponse() {
     const message = encodeURIComponent(
       "I said YES ❤️ Guess you’re stuck with me now 😄"
     );
-
     window.location.href =
       "https://wa.me/918125103354?text=" + message;
   }
@@ -183,6 +202,11 @@
     modal.style.display = "none";
   }
 
+  function closeEverything() {
+    closeModal();
+    clearInterval(heartInterval);
+  }
+
   function launchConfetti() {
     for (let i = 0; i < 80; i++) {
       const c = document.createElement("div");
@@ -194,6 +218,20 @@
       document.body.appendChild(c);
       setTimeout(() => c.remove(), 3000);
     }
+  }
+
+  function startHeartRain() {
+    heartInterval = setInterval(() => {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.innerText = "❤️";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.top = "-30px";   // start from top
+      heart.style.fontSize = 16 + Math.random() * 20 + "px";
+      heart.style.animationDuration = 3 + Math.random() * 3 + "s";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 6000);
+    }, 200);
   }
 </script>
 
