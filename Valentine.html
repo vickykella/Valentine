@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Valentine?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffe6ec, #ffd6e0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 30px 20px;
+      border-radius: 14px;
+      text-align: center;
+      width: 90%;
+      max-width: 340px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #yesBtn {
+      background: #ff4d6d;
+      color: white;
+    }
+
+    #noBtn {
+      background: #ddd;
+      position: absolute;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px 20px;
+      border-radius: 12px;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+    }
+
+    .confetti {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      from { transform: translateY(-10vh) rotate(0deg); }
+      to { transform: translateY(110vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Will you be my Valentine? ❤️</h2>
+  <button id="yesBtn">Yes</button>
+  <button id="noBtn">No</button>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <p id="modalText"></p>
+    <div id="modalButtons"></div>
+  </div>
+</div>
+
+<script>
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const modal = document.getElementById("modal");
+  const modalText = document.getElementById("modalText");
+  const modalButtons = document.getElementById("modalButtons");
+
+  let scramble = true;
+
+  function randomPosition() {
+    const x = Math.random() * (window.innerWidth - 120);
+    const y = Math.random() * (window.innerHeight - 60);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+  }
+
+  noBtn.addEventListener("mouseover", () => {
+    if (scramble) randomPosition();
+  });
+
+  setTimeout(() => {
+    scramble = false;
+    noBtn.style.position = "static";
+  }, 30000);
+
+  noBtn.addEventListener("click", () => {
+    showModal(
+      "Fair enough 🙂 Wishing you all the happiness in the world.",
+      [{ text: "Close", action: closeModal }]
+    );
+  });
+
+  yesBtn.addEventListener("click", confirmYes);
+
+  function confirmYes() {
+    showModal(
+      "Are you sure? 😌",
+      [
+        { text: "No", action: confirmYes },
+        { text: "Yes", action: finalYes }
+      ]
+    );
+  }
+
+  function finalYes() {
+    closeModal();
+    launchConfetti();
+
+    setTimeout(() => {
+      showModal(
+        "You're in bad luck 😄 I’m not leaving you for the rest of my life ❤️",
+        [
+          {
+            text: "You wanna let him know you said YES?",
+            action: sendResponse
+          }
+        ]
+      );
+    }, 600);
+  }
+
+  function sendResponse() {
+    const message = encodeURIComponent(
+      "I said YES ❤️ Guess you’re stuck with me now 😄"
+    );
+
+    window.location.href =
+      "https://wa.me/918125103354?text=" + message;
+  }
+
+  function showModal(text, buttons) {
+    modalText.innerText = text;
+    modalButtons.innerHTML = "";
+    buttons.forEach(btn => {
+      const b = document.createElement("button");
+      b.innerText = btn.text;
+      b.onclick = btn.action;
+      modalButtons.appendChild(b);
+    });
+    modal.style.display = "flex";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+  }
+
+  function launchConfetti() {
+    for (let i = 0; i < 80; i++) {
+      const c = document.createElement("div");
+      c.className = "confetti";
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.background =
+        `hsl(${Math.random() * 360}, 100%, 60%)`;
+      c.style.animationDuration = 2 + Math.random() * 2 + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3000);
+    }
+  }
+</script>
+
+</body>
+</html>
